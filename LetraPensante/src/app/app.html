@@ -194,7 +194,12 @@
 
     <form *ngIf="showInsertForm" (ngSubmit)="onInsert()" #insertForm="ngForm" style="width: 100%; max-width: 500px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
   <label for="id" style="font-weight: 500;">ID</label>
-  <input id="id" type="text" name="id" [(ngModel)]="insertData.id" required placeholder="ID" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <input id="id" type="number" name="id" [(ngModel)]="insertData.id" required placeholder="ID" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" min="0" step="1" #idField="ngModel" />
+  <div *ngIf="idField.invalid && (idField.dirty || idField.touched)" style="color: #e11d48; font-size: 0.9rem;">
+    <span *ngIf="idField.errors?.['required']">El campo ID es obligatorio.</span>
+    <span *ngIf="idField.errors?.['min']">El ID debe ser un número positivo.</span>
+    <span *ngIf="idField.errors?.['pattern']">El ID debe ser un número válido.</span>
+  </div>
   <label for="nombre" style="font-weight: 500;">Nombre</label>
   <input id="nombre" type="text" name="nombre" [(ngModel)]="insertData.nombre" required placeholder="Nombre" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
   <label for="autor" style="font-weight: 500;">Autor</label>
@@ -202,7 +207,13 @@
   <label for="editorial" style="font-weight: 500;">Editorial</label>
   <input id="editorial" type="text" name="editorial" [(ngModel)]="insertData.editorial" required placeholder="Editorial" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
   <label for="anioEdicion" style="font-weight: 500;">Año Edición</label>
-  <input id="anioEdicion" type="text" name="anioEdicion" [(ngModel)]="insertData.anioEdicion" required placeholder="Año Edición" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <input id="anioEdicion" type="number" name="anioEdicion" [(ngModel)]="insertData.anioEdicion" required placeholder="Año Edición" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" min="1700" max="2025" step="1" #anioField="ngModel" />
+  <div *ngIf="anioField.invalid && (anioField.dirty || anioField.touched)" style="color: #e11d48; font-size: 0.9rem;">
+    <span *ngIf="anioField.errors?.['required']">El año de edición es obligatorio.</span>
+    <span *ngIf="anioField.errors?.['min']">El año debe ser mayor o igual a 1700.</span>
+    <span *ngIf="anioField.errors?.['max']">El año debe ser menor o igual a 2025.</span>
+    <span *ngIf="anioField.errors?.['pattern']">El año debe ser un número válido.</span>
+  </div>
   <label for="ubicacion" style="font-weight: 500;">Ubicación</label>
   <input id="ubicacion" type="text" name="ubicacion" [(ngModel)]="insertData.ubicacion" required placeholder="Ubicación" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
       <button type="submit" [disabled]="!insertForm.form.valid" style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #f59e42; color: #fff; font-size: 1rem; cursor: pointer;">Enviar</button>

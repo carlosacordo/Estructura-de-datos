@@ -41,22 +41,39 @@ export class App {
     if (Object.values(this.insertData).some(v => !v)) {
       return;
     }
-    // Clear form data immediately
-    this.insertData = { id: '', nombre: '', autor: '', editorial: '', anioEdicion: '', ubicacion: '' };
-    this.http.post<any>('https://letrapensanteapi.azurewebsites.net/libros', this.insertData).subscribe({
+    // Primero, verificar si el libro ya existe por ID
+    const id = this.insertData.id;
+    this.http.get<any>(`https://letrapensanteapi.azurewebsites.net/libros/${encodeURIComponent(id)}`).subscribe({
       next: (data) => {
-        // Close the form and reset all main page state
-        this.showInsertForm = false;
-        this.insertData = { id: '', nombre: '', autor: '', editorial: '', anioEdicion: '', ubicacion: '' };
-        this.searchTerm = '';
-        this.libro = null;
-        this.notFound = false;
-        this.notFoundMessage = '';
+        // Si responde 200, el libro ya existe
+        alert('El Libro con el id ingresado ya existe');
       },
       error: (err) => {
-        this.notFoundMessage = err?.error?.message || (typeof err?.error === 'string' ? err.error : 'Error al insertar libro.');
-        this.notFound = true;
-        this.libro = null;
+        if (err.status === 404) {
+          // No existe, proceder a insertar
+          this.http.post<any>('https://letrapensanteapi.azurewebsites.net/libros', this.insertData).subscribe({
+            next: (data) => {
+              alert('El Libro se registro correctamente');
+              // Close the form and reset all main page state
+              this.showInsertForm = false;
+              this.insertData = { id: '', nombre: '', autor: '', editorial: '', anioEdicion: '', ubicacion: '' };
+              this.searchTerm = '';
+              this.libro = null;
+              this.notFound = false;
+              this.notFoundMessage = '';
+            },
+            error: (err2) => {
+              this.notFoundMessage = err2?.error?.message || (typeof err2?.error === 'string' ? err2.error : 'Error al insertar libro.');
+              this.notFound = true;
+              this.libro = null;
+            }
+          });
+        } else {
+          // Otro error
+          this.notFoundMessage = err?.error?.message || (typeof err?.error === 'string' ? err.error : 'Error al verificar existencia del libro.');
+          this.notFound = true;
+          this.libro = null;
+        }
       }
     });
   }
