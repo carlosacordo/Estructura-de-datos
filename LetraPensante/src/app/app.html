@@ -177,20 +177,52 @@
 <main class="main" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-image: url('assets/library-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative;">
   <h1 style="font-size: 2.5rem; margin-bottom: 2rem; text-align: center;">Bienvenido a LetraPensante</h1>
   <div style="width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center;">
-    <input
-      type="text"
-      [(ngModel)]="searchTerm"
-      (input)="onSearch()"
-      placeholder="Buscar..."
-      style="width: 100%; padding: 1rem; font-size: 1.2rem; border-radius: 0.5rem; border: 1px solid #ccc; margin-bottom: 1.5rem; text-align: center;"
-    />
-  <ul *ngIf="filteredItems.length > 0" style="width: 100%; list-style: none; padding: 0; margin: 0;">
-      <li *ngFor="let item of filteredItems" style="padding: 0.75rem 1rem; border-bottom: 1px solid #eee; text-align: center;">
-        {{ item }}
-      </li>
-    </ul>
-    <div *ngIf="searchTerm && filteredItems.length === 0" style="text-align: center; color: #888;">No se encontraron resultados.</div>
-  </div>
+    <ng-container *ngIf="!showInsertForm">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Buscar..."
+        style="width: 100%; padding: 1rem; font-size: 1.2rem; border-radius: 0.5rem; border: 1px solid #ccc; margin-bottom: 1.5rem; text-align: center;"
+      />
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <button (click)="onSearch()" style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #4f46e5; color: #fff; font-size: 1rem; cursor: pointer;">Buscar</button>
+        <button (click)="toggleInsertForm()" style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #f59e42; color: #fff; font-size: 1rem; cursor: pointer;">Insertar</button>
+        <button (click)="onCreate()" disabled style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #10b981; color: #fff; font-size: 1rem; cursor: not-allowed; opacity: 0.6;">Crear Archivo</button>
+        <button (click)="onDelete()" disabled style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #ef4444; color: #fff; font-size: 1rem; cursor: not-allowed; opacity: 0.6;">Eliminar Archivo</button>
+      </div>
+    </ng-container>
+
+    <form *ngIf="showInsertForm" (ngSubmit)="onInsert()" #insertForm="ngForm" style="width: 100%; max-width: 500px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+  <label for="id" style="font-weight: 500;">ID</label>
+  <input id="id" type="text" name="id" [(ngModel)]="insertData.id" required placeholder="ID" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <label for="nombre" style="font-weight: 500;">Nombre</label>
+  <input id="nombre" type="text" name="nombre" [(ngModel)]="insertData.nombre" required placeholder="Nombre" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <label for="autor" style="font-weight: 500;">Autor</label>
+  <input id="autor" type="text" name="autor" [(ngModel)]="insertData.autor" required placeholder="Autor" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <label for="editorial" style="font-weight: 500;">Editorial</label>
+  <input id="editorial" type="text" name="editorial" [(ngModel)]="insertData.editorial" required placeholder="Editorial" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <label for="anioEdicion" style="font-weight: 500;">Año Edición</label>
+  <input id="anioEdicion" type="text" name="anioEdicion" [(ngModel)]="insertData.anioEdicion" required placeholder="Año Edición" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+  <label for="ubicacion" style="font-weight: 500;">Ubicación</label>
+  <input id="ubicacion" type="text" name="ubicacion" [(ngModel)]="insertData.ubicacion" required placeholder="Ubicación" style="padding: 0.5rem; border-radius: 0.3rem; border: 1px solid #ccc;" />
+      <button type="submit" [disabled]="!insertForm.form.valid" style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #f59e42; color: #fff; font-size: 1rem; cursor: pointer;">Enviar</button>
+      <button type="button" (click)="toggleInsertForm()" style="padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; background: #888; color: #fff; font-size: 1rem; cursor: pointer;">Cancelar</button>
+    </form>
+    </div>
+    <div *ngIf="libro && !showInsertForm" style="display: flex; justify-content: center; width: 100%; margin-top: 1rem;">
+      <table style="min-width: 320px; max-width: 500px; background: rgba(255,255,255,0.95); border-radius: 8px; border: 1.5px solid #d1d5db; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+        <tr>
+          <th style="text-align:left; padding: 0.5rem;">Campo</th>
+          <th style="text-align:left; padding: 0.5rem;">Valor</th>
+        </tr>
+        <tr *ngFor="let key of libro | keyvalue">
+          <td style="padding: 0.5rem; border-bottom: 1px solid #eee;">{{ key.key | fieldTranslate }}</td>
+          <td style="padding: 0.5rem; border-bottom: 1px solid #eee;">{{ key.value }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div *ngIf="notFound && !showInsertForm" style="text-align: center; color: #888; margin-top: 1rem;">{{ notFoundMessage }}</div>
 </main>
 
 
